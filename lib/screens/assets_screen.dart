@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/asset_provider.dart';
 import '../models/asset.dart';
 import '../models/asset_type.dart';
@@ -21,11 +22,12 @@ class AssetsScreen extends StatelessWidget {
       },
       child: Consumer<AssetProvider>(
         builder: (context, provider, _) {
+          final s = S.of(context);
           return Scaffold(
             body: provider.loading
                 ? const Center(child: CircularProgressIndicator())
                 : provider.assets.isEmpty
-                    ? _buildEmpty(context)
+                    ? _buildEmpty(context, s)
                     : ListView.builder(
                         padding: const EdgeInsets.all(16),
                         itemCount: provider.assets.length,
@@ -43,7 +45,7 @@ class AssetsScreen extends StatelessWidget {
             floatingActionButton: FloatingActionButton.extended(
               onPressed: () => _showForm(context, provider, null),
               icon: const Icon(Icons.add),
-              label: const Text('添加资产'),
+              label: Text(s.assetsAddAsset),
               backgroundColor: const Color(AppConstants.assetColor),
               foregroundColor: Colors.white,
             ),
@@ -53,16 +55,16 @@ class AssetsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmpty(BuildContext context) {
+  Widget _buildEmpty(BuildContext context, S s) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.account_balance_wallet, size: 64, color: Colors.grey[300]),
           const SizedBox(height: 16),
-          Text('还没有资产记录', style: TextStyle(fontSize: 16, color: Colors.grey[500])),
+          Text(s.assetsEmpty, style: TextStyle(fontSize: 16, color: Colors.grey[500])),
           const SizedBox(height: 8),
-          Text('点击下方按钮添加第一笔资产', style: TextStyle(fontSize: 14, color: Colors.grey[400])),
+          Text(s.assetsEmptyHint, style: TextStyle(fontSize: 14, color: Colors.grey[400])),
         ],
       ),
     );
@@ -108,20 +110,21 @@ class AssetsScreen extends StatelessWidget {
   }
 
   void _confirmDelete(BuildContext context, AssetProvider provider, Asset asset) {
+    final s = S.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('确认删除'),
-        content: Text('确定要删除资产「${asset.name}」吗？相关历史数据也会被删除。'),
+        title: Text(s.dialogConfirmDelete),
+        content: Text(s.assetsDeleteConfirm),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(s.btnCancel)),
           TextButton(
             onPressed: () {
               provider.deleteAsset(asset.id!);
               Navigator.pop(context);
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('删除'),
+            child: Text(s.btnDelete),
           ),
         ],
       ),
@@ -144,6 +147,7 @@ class _AssetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -187,7 +191,7 @@ class _AssetCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('当前价值', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                      Text(s.assetsCurrentValue, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
                       Text(
                         Formatters.formatCurrencyFull(asset.currentValue),
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
@@ -200,7 +204,7 @@ class _AssetCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text('收益率', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                        Text(s.assetsReturnRate, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
                         Text(
                           Formatters.formatPercent(asset.returnRate),
                           style: TextStyle(
@@ -222,12 +226,12 @@ class _AssetCard extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onEdit,
                   icon: const Icon(Icons.edit, size: 18),
-                  label: const Text('编辑'),
+                  label: Text(s.btnEdit),
                 ),
                 TextButton.icon(
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete_outline, size: 18),
-                  label: const Text('删除'),
+                  label: Text(s.btnDelete),
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                 ),
               ],

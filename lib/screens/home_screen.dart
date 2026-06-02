@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../utils/constants.dart';
 import 'dashboard_screen.dart';
 import 'assets_screen.dart';
@@ -27,9 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppConstants.appName),
+        title: Text(s.appName),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         actions: [
@@ -58,33 +60,33 @@ class _HomeScreenState extends State<HomeScreen> {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'asset_types',
                 child: Row(
                   children: [
-                    Icon(Icons.category, size: 20),
-                    SizedBox(width: 12),
-                    Text('资产类型管理'),
+                    const Icon(Icons.category, size: 20),
+                    const SizedBox(width: 12),
+                    Text(s.menuAssetTypes),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'settings',
                 child: Row(
                   children: [
-                    Icon(Icons.settings, size: 20),
-                    SizedBox(width: 12),
-                    Text('设置'),
+                    const Icon(Icons.settings, size: 20),
+                    const SizedBox(width: 12),
+                    Text(s.menuSettings),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'about',
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline, size: 20),
-                    SizedBox(width: 12),
-                    Text('关于'),
+                    const Icon(Icons.info_outline, size: 20),
+                    const SizedBox(width: 12),
+                    Text(s.menuAbout),
                   ],
                 ),
               ),
@@ -103,26 +105,26 @@ class _HomeScreenState extends State<HomeScreen> {
             _currentIndex = index;
           });
         },
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard),
-            label: '首页',
+            icon: const Icon(Icons.dashboard_outlined),
+            selectedIcon: const Icon(Icons.dashboard),
+            label: s.navHome,
           ),
           NavigationDestination(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: Icon(Icons.account_balance_wallet),
-            label: '资产',
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            selectedIcon: const Icon(Icons.account_balance_wallet),
+            label: s.navAssets,
           ),
           NavigationDestination(
-            icon: Icon(Icons.trending_down_outlined),
-            selectedIcon: Icon(Icons.trending_down),
-            label: '负债',
+            icon: const Icon(Icons.trending_down_outlined),
+            selectedIcon: const Icon(Icons.trending_down),
+            label: s.navLiabilities,
           ),
           NavigationDestination(
-            icon: Icon(Icons.swap_horiz_outlined),
-            selectedIcon: Icon(Icons.swap_horiz),
-            label: '资金流',
+            icon: const Icon(Icons.swap_horiz_outlined),
+            selectedIcon: const Icon(Icons.swap_horiz),
+            label: s.navCashFlow,
           ),
         ],
       ),

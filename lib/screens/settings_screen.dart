@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/user_provider.dart';
+import '../providers/locale_provider.dart';
 import '../database/database_helper.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -17,8 +19,10 @@ class SettingsScreen extends StatelessWidget {
       child: Consumer<UserProvider>(
         builder: (context, provider, _) {
           final user = provider.user;
+          final s = S.of(context);
+          final localeProvider = Provider.of<LocaleProvider>(context);
           return Scaffold(
-            appBar: AppBar(title: const Text('设置')),
+            appBar: AppBar(title: Text(s.settingsTitle)),
             body: ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -29,33 +33,33 @@ class SettingsScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('用户信息', style: Theme.of(context).textTheme.titleMedium),
+                        Text(s.settingsUserInfo, style: Theme.of(context).textTheme.titleMedium),
                         const SizedBox(height: 16),
                         TextFormField(
-                          initialValue: user?.username ?? '默认用户',
-                          decoration: const InputDecoration(
-                            labelText: '用户名',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.person),
+                          initialValue: user?.username ?? s.settingsDefaultUser,
+                          decoration: InputDecoration(
+                            labelText: s.settingsUsername,
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.person),
                           ),
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
                           initialValue: user?.phone ?? '',
-                          decoration: const InputDecoration(
-                            labelText: '手机号',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.phone),
+                          decoration: InputDecoration(
+                            labelText: s.settingsPhone,
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.phone),
                           ),
                           keyboardType: TextInputType.phone,
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
                           initialValue: user?.email ?? '',
-                          decoration: const InputDecoration(
-                            labelText: '邮箱',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.email),
+                          decoration: InputDecoration(
+                            labelText: s.settingsEmail,
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.email),
                           ),
                           keyboardType: TextInputType.emailAddress,
                         ),
@@ -64,22 +68,32 @@ class SettingsScreen extends StatelessWidget {
                           width: double.infinity,
                           child: FilledButton.icon(
                             onPressed: () async {
-                              // Save user info
                               if (user != null) {
                                 await provider.updateUser(user.copyWith());
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('保存成功'), backgroundColor: Colors.green),
+                                    SnackBar(content: Text(s.settingsSaveSuccess), backgroundColor: Colors.green),
                                   );
                                 }
                               }
                             },
                             icon: const Icon(Icons.save),
-                            label: const Text('保存'),
+                            label: Text(s.btnSave),
                           ),
                         ),
                       ],
                     ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // 语言切换
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.language, color: Colors.blue),
+                    title: Text(s.settingsLanguage),
+                    subtitle: Text(LocaleProvider.getDisplayName(localeProvider.locale)),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => _showLanguagePicker(context, localeProvider),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -89,15 +103,15 @@ class SettingsScreen extends StatelessWidget {
                     children: [
                       ListTile(
                         leading: const Icon(Icons.download, color: Colors.blue),
-                        title: const Text('导出数据'),
-                        subtitle: const Text('导出所有数据为 JSON 文件'),
+                        title: Text(s.settingsExportData),
+                        subtitle: Text(s.settingsExportHint),
                         onTap: () => _exportData(context),
                       ),
                       const Divider(height: 1),
                       ListTile(
                         leading: const Icon(Icons.delete_forever, color: Colors.red),
-                        title: const Text('清除数据'),
-                        subtitle: const Text('清除所有数据（不可恢复）'),
+                        title: Text(s.settingsClearData),
+                        subtitle: Text(s.settingsClearHint),
                         onTap: () => _confirmClearData(context),
                       ),
                     ],
@@ -111,7 +125,36 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  void _showLanguagePicker(BuildContext context, LocaleProvider provider) {
+    final s = S.of(context);
+    showDialog(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: Text(s.settingsSelectLanguage),
+        children: LocaleProvider.supportedLocales.map((locale) {
+          return SimpleDialogOption(
+            onPressed: () {
+              provider.setLocale(locale);
+              Navigator.pop(ctx);
+            },
+            child: Row(
+              children: [
+                Radio<Locale>(
+                  value: locale,
+                  groupValue: provider.locale,
+                  onChanged: (v) { provider.setLocale(v!); Navigator.pop(ctx); },
+                ),
+                Text(LocaleProvider.getDisplayName(locale)),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   Future<void> _exportData(BuildContext context) async {
+    final s = S.of(context);
     try {
       final db = DatabaseHelper();
       final data = await db.exportAllData();
@@ -125,26 +168,27 @@ class SettingsScreen extends StatelessWidget {
       if (context.mounted) {
         await Share.shareXFiles(
           [XFile(file.path)],
-          text: '聚财数据备份 $timestamp',
+          text: '${s.appName} $timestamp',
         );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('导出失败: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('${s.settingsExportFailed}: $e'), backgroundColor: Colors.red),
         );
       }
     }
   }
 
   void _confirmClearData(BuildContext context) {
+    final s = S.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('⚠️ 危险操作'),
-        content: const Text('确定要清除所有数据吗？此操作不可恢复！'),
+        title: Text(s.settingsDangerWarning),
+        content: Text(s.settingsConfirmClear),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(s.btnCancel)),
           TextButton(
             onPressed: () async {
               final db = DatabaseHelper();
@@ -157,12 +201,12 @@ class SettingsScreen extends StatelessWidget {
               if (ctx.mounted) {
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('数据已清除'), backgroundColor: Colors.orange),
+                  SnackBar(content: Text(s.settingsDataCleared), backgroundColor: Colors.orange),
                 );
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('确认清除'),
+            child: Text(s.settingsConfirmClearBtn),
           ),
         ],
       ),

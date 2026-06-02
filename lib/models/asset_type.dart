@@ -1,3 +1,6 @@
+import 'package:flutter/widgets.dart';
+import '../l10n/app_localizations.dart';
+
 class AssetType {
   final int? id;
   final String userId;
@@ -42,6 +45,7 @@ class AssetType {
   }
 
   String get categoryLabel {
+    // Legacy fallback for non-context usage
     switch (category) {
       case 'fixed':
         return '固定资产';
@@ -51,6 +55,16 @@ class AssetType {
         return '消费品';
       default:
         return category;
+    }
+  }
+
+  static String getCategoryLabel(BuildContext context, String category) {
+    final s = S.of(context);
+    switch (category) {
+      case 'fixed': return s.categoryFixedAssets;
+      case 'liquid': return s.categoryLiquidAssets;
+      case 'consumer': return s.categoryConsumerGoods;
+      default: return category;
     }
   }
 }

@@ -1,3 +1,6 @@
+import 'package:flutter/widgets.dart';
+import '../l10n/app_localizations.dart';
+
 class AppConstants {
   static const String appName = '聚财';
   static const String appVersion = '2.0.0';
@@ -5,39 +8,23 @@ class AppConstants {
 
   // 资产分类
   static const List<String> assetCategories = ['fixed', 'liquid', 'consumer'];
-  static const Map<String, String> assetCategoryLabels = {
-    'fixed': '固定资产',
-    'liquid': '流动资产',
-    'consumer': '消费品',
-  };
 
   // 负债类型
-  static const Map<String, String> liabilityTypeLabels = {
-    'mortgage': '房贷',
-    'car_loan': '车贷',
-    'credit_card': '信用卡',
-    'other': '其他',
-  };
+  static const List<String> liabilityTypes = ['mortgage', 'car_loan', 'credit_card', 'other'];
 
-  // 收入类别
-  static const List<String> incomeCategories = [
-    '工资', '奖金', '租金收入', '投资收益', '兼职', '经营收入', '其他收入'
+  // 收入类别 (key)
+  static const List<String> incomeCategoryKeys = [
+    'salary', 'bonus', 'rent', 'investment', 'partTime', 'business', 'otherIncome'
   ];
 
-  // 支出类别
-  static const List<String> expenseCategories = [
-    '住房', '餐饮', '交通', '水电', '医疗', '教育', '娱乐', '购物', '保险', '还贷', '投资', '其他支出'
+  // 支出类别 (key)
+  static const List<String> expenseCategoryKeys = [
+    'housing', 'food', 'transport', 'utilities', 'medical', 'education',
+    'entertainment', 'shopping', 'insurance', 'loanRepayment', 'investment', 'otherExpense'
   ];
 
-  // 频率选项
-  static const Map<String, String> frequencyLabels = {
-    'once': '一次性',
-    'daily': '每天',
-    'weekly': '每周',
-    'monthly': '每月',
-    'quarterly': '每季度',
-    'yearly': '每年',
-  };
+  // 频率选项 (key list)
+  static const List<String> frequencyKeys = ['once', 'daily', 'weekly', 'monthly', 'quarterly', 'yearly'];
 
   // 默认资产类型
   static const List<Map<String, dynamic>> defaultAssetTypes = [
@@ -60,4 +47,79 @@ class AppConstants {
   static const int assetColor = 0xFF2196F3;
   static const int liabilityColor = 0xFFE53935;
   static const int netWorthColor = 0xFF43A047;
+
+  // ============ i18n helper methods ============
+
+  static String getCategoryLabel(BuildContext context, String category) {
+    final s = S.of(context);
+    switch (category) {
+      case 'fixed': return s.categoryFixedAssets;
+      case 'liquid': return s.categoryLiquidAssets;
+      case 'consumer': return s.categoryConsumerGoods;
+      default: return category;
+    }
+  }
+
+  static String getLiabilityTypeLabel(BuildContext context, String type) {
+    final s = S.of(context);
+    switch (type) {
+      case 'mortgage': return s.categoryMortgage;
+      case 'car_loan': return s.categoryCarLoan;
+      case 'credit_card': return s.categoryCreditCard;
+      case 'other': return s.categoryOther;
+      default: return type;
+    }
+  }
+
+  static String getFrequencyLabel(BuildContext context, String frequency) {
+    final s = S.of(context);
+    switch (frequency) {
+      case 'once': return s.frequencyOnce;
+      case 'daily': return s.frequencyDaily;
+      case 'weekly': return s.frequencyWeekly;
+      case 'monthly': return s.frequencyMonthly;
+      case 'quarterly': return s.frequencyQuarterly;
+      case 'yearly': return s.frequencyYearly;
+      default: return frequency;
+    }
+  }
+
+  static String getIncomeCategoryLabel(BuildContext context, String key) {
+    final s = S.of(context);
+    switch (key) {
+      case 'salary': return s.incomeSalary;
+      case 'bonus': return s.incomeBonus;
+      case 'rent': return s.incomeRent;
+      case 'investment': return s.incomeInvestment;
+      case 'partTime': return s.incomePartTime;
+      case 'business': return s.incomeBusiness;
+      case 'otherIncome': return s.incomeOther;
+      default: return key; // fallback for legacy Chinese data
+    }
+  }
+
+  static String getExpenseCategoryLabel(BuildContext context, String key) {
+    final s = S.of(context);
+    switch (key) {
+      case 'housing': return s.expenseHousing;
+      case 'food': return s.expenseFood;
+      case 'transport': return s.expenseTransport;
+      case 'utilities': return s.expenseUtilities;
+      case 'medical': return s.expenseMedical;
+      case 'education': return s.expenseEducation;
+      case 'entertainment': return s.expenseEntertainment;
+      case 'shopping': return s.expenseShopping;
+      case 'insurance': return s.expenseInsurance;
+      case 'loanRepayment': return s.expenseLoanRepayment;
+      case 'investment': return s.expenseInvestment;
+      case 'otherExpense': return s.expenseOther;
+      default: return key; // fallback for legacy Chinese data
+    }
+  }
+
+  // Get localized category label (auto-detect income or expense)
+  static String getCategoryLabelByType(BuildContext context, String key, String type) {
+    if (type == 'income') return getIncomeCategoryLabel(context, key);
+    return getExpenseCategoryLabel(context, key);
+  }
 }

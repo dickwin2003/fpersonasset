@@ -1,15 +1,19 @@
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import '../l10n/app_localizations.dart';
 
 class Formatters {
-  static String formatCurrency(double value) {
-    if (value.abs() >= 100000000) {
-      return '${(value / 100000000).toStringAsFixed(2)}亿';
-    } else if (value.abs() >= 10000000) {
-      return '${(value / 10000000).toStringAsFixed(2)}千万';
-    } else if (value.abs() >= 1000000) {
-      return '${(value / 1000000).toStringAsFixed(2)}百万';
-    } else if (value.abs() >= 10000) {
-      return '${(value / 10000).toStringAsFixed(2)}万';
+  static String formatCurrency(double value, {BuildContext? context}) {
+    final abs = value.abs();
+    final S? s = context != null ? S.of(context) : null;
+    if (abs >= 100000000) {
+      return '${(value / 100000000).toStringAsFixed(2)}${s?.currencyHundredMillion ?? '亿'}';
+    } else if (abs >= 10000000) {
+      return '${(value / 10000000).toStringAsFixed(2)}${s?.currencyTenMillion ?? '千万'}';
+    } else if (abs >= 1000000) {
+      return '${(value / 1000000).toStringAsFixed(2)}${s?.currencyOneMillion ?? '百万'}';
+    } else if (abs >= 10000) {
+      return '${(value / 10000).toStringAsFixed(2)}${s?.currencyTenThousand ?? '万'}';
     }
     return value.toStringAsFixed(2);
   }

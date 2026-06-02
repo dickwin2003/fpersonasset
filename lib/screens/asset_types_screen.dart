@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/asset_provider.dart';
 import '../models/asset_type.dart';
 import '../database/database_helper.dart';
@@ -14,9 +15,10 @@ class AssetTypesScreen extends StatelessWidget {
       create: (_) => AssetProvider()..loadAssetTypes(),
       child: Consumer<AssetProvider>(
         builder: (context, provider, _) {
+          final s = S.of(context);
           final types = provider.assetTypes;
           return Scaffold(
-            appBar: AppBar(title: const Text('资产类型管理')),
+            appBar: AppBar(title: Text(s.assetTypesTitle)),
             body: ListView(
               padding: const EdgeInsets.all(16),
               children: AppConstants.assetCategories.map((category) {
@@ -27,7 +29,7 @@ class AssetTypesScreen extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Text(
-                        AppConstants.assetCategoryLabels[category] ?? category,
+                        AppConstants.getCategoryLabel(context, category),
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -37,7 +39,7 @@ class AssetTypesScreen extends StatelessWidget {
                         title: Text(type.name),
                         subtitle: type.description != null ? Text(type.description!) : null,
                         trailing: type.hasDepreciation
-                            ? Text('折旧率: ${type.depreciationRate}%', style: const TextStyle(fontSize: 12, color: Colors.orange))
+                            ? Text('${s.assetTypesDepreciationRate}: ${type.depreciationRate}%', style: const TextStyle(fontSize: 12, color: Colors.orange))
                             : null,
                         onTap: () => _showForm(context, provider, type),
                       ),
@@ -76,6 +78,7 @@ class AssetTypesScreen extends StatelessWidget {
   }
 
   void _showForm(BuildContext context, AssetProvider provider, AssetType? type) {
+    final s = S.of(context);
     final nameCtrl = TextEditingController(text: type?.name ?? '');
     final descCtrl = TextEditingController(text: type?.description ?? '');
     final rateCtrl = TextEditingController(text: type?.depreciationRate.toString() ?? '0');
@@ -95,40 +98,40 @@ class AssetTypesScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(type == null ? '添加资产类型' : '编辑资产类型',
+                Text(type == null ? s.assetTypesAddType : s.assetTypesEditType,
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: nameCtrl,
-                  decoration: const InputDecoration(
-                    labelText: '类型名称', border: OutlineInputBorder()),
+                  decoration: InputDecoration(
+                    labelText: s.assetTypesTypeName, border: const OutlineInputBorder()),
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   initialValue: category,
-                  decoration: const InputDecoration(
-                    labelText: '分类', border: OutlineInputBorder()),
-                  items: AppConstants.assetCategoryLabels.entries.map((e) =>
-                    DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+                  decoration: InputDecoration(
+                    labelText: s.assetTypesCategory, border: const OutlineInputBorder()),
+                  items: AppConstants.assetCategories.map((c) =>
+                    DropdownMenuItem(value: c, child: Text(AppConstants.getCategoryLabel(context, c)))).toList(),
                   onChanged: (v) => setModalState(() => category = v ?? 'liquid'),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: descCtrl,
-                  decoration: const InputDecoration(
-                    labelText: '描述', border: OutlineInputBorder()),
+                  decoration: InputDecoration(
+                    labelText: s.assetTypesDescription, border: const OutlineInputBorder()),
                 ),
                 const SizedBox(height: 12),
                 SwitchListTile(
-                  title: const Text('支持折旧'),
+                  title: Text(s.assetTypesDepreciation),
                   value: hasDepreciation,
                   onChanged: (v) => setModalState(() => hasDepreciation = v),
                 ),
                 if (hasDepreciation)
                   TextFormField(
                     controller: rateCtrl,
-                    decoration: const InputDecoration(
-                      labelText: '折旧率', border: OutlineInputBorder(), suffixText: '%'),
+                    decoration: InputDecoration(
+                      labelText: s.assetTypesDepreciationRate, border: const OutlineInputBorder(), suffixText: '%'),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   ),
                 const SizedBox(height: 20),
@@ -156,7 +159,7 @@ class AssetTypesScreen extends StatelessWidget {
                     provider.loadAssetTypes();
                     if (ctx.mounted) Navigator.pop(ctx);
                   },
-                  child: Text(type == null ? '添加' : '保存'),
+                  child: Text(type == null ? s.btnAdd : s.btnSave),
                 ),
               ],
             ),

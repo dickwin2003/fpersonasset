@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/asset_type.dart';
 import '../../utils/formatters.dart';
 
@@ -56,6 +57,7 @@ class _AssetFormState extends State<AssetForm> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return Padding(
       padding: EdgeInsets.only(
         left: 16, right: 16, top: 16,
@@ -68,56 +70,56 @@ class _AssetFormState extends State<AssetForm> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              isEditing ? '编辑资产' : '添加资产',
+              isEditing ? s.assetsEditAsset : s.assetsAddAsset,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: '资产名称',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.label),
+              decoration: InputDecoration(
+                labelText: s.assetFormName,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.label),
               ),
-              validator: (v) => v == null || v.isEmpty ? '请输入名称' : null,
+              validator: (v) => v == null || v.isEmpty ? s.assetFormEnterName : null,
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<int>(
               initialValue: _selectedTypeId,
-              decoration: const InputDecoration(
-                labelText: '资产类型',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.category),
+              decoration: InputDecoration(
+                labelText: s.assetFormType,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.category),
               ),
               items: widget.assetTypes.map((type) {
                 return DropdownMenuItem(
                   value: type.id,
-                  child: Text('${type.name} (${type.categoryLabel})'),
+                  child: Text('${type.name} (${AssetType.getCategoryLabel(context, type.category)})'),
                 );
               }).toList(),
               onChanged: (v) => setState(() => _selectedTypeId = v),
-              validator: (v) => v == null ? '请选择类型' : null,
+              validator: (v) => v == null ? s.assetFormSelectType : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _valueController,
-              decoration: const InputDecoration(
-                labelText: '当前价值',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.monetization_on),
-                suffixText: '元',
+              decoration: InputDecoration(
+                labelText: s.assetFormCurrentValue,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.monetization_on),
+                suffixText: s.currencyYuan,
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              validator: (v) => v == null || v.isEmpty ? '请输入价值' : null,
+              validator: (v) => v == null || v.isEmpty ? s.assetFormEnterValue : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _purchaseValueController,
-              decoration: const InputDecoration(
-                labelText: '购入价值（选填）',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.shopping_cart),
-                suffixText: '元',
+              decoration: InputDecoration(
+                labelText: s.assetFormPurchaseValue,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.shopping_cart),
+                suffixText: s.currencyYuan,
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
             ),
@@ -126,7 +128,7 @@ class _AssetFormState extends State<AssetForm> {
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.calendar_today),
               title: Text(_purchaseDate == null
-                  ? '购入日期（选填）'
+                  ? s.assetFormPurchaseDate
                   : Formatters.formatDate(_purchaseDate.toString())),
               trailing: const Icon(Icons.chevron_right),
               shape: RoundedRectangleBorder(
@@ -146,17 +148,17 @@ class _AssetFormState extends State<AssetForm> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: '描述（选填）',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.description),
+              decoration: InputDecoration(
+                labelText: s.assetFormDescription,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.description),
               ),
               maxLines: 2,
             ),
             const SizedBox(height: 20),
             FilledButton(
               onPressed: _submit,
-              child: Text(isEditing ? '保存修改' : '添加资产'),
+              child: Text(isEditing ? s.btnSave : s.assetsAddAsset),
             ),
           ],
         ),

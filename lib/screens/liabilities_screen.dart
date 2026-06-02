@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/liability_provider.dart';
 import '../models/liability.dart';
 import '../utils/constants.dart';
@@ -14,11 +15,12 @@ class LiabilitiesScreen extends StatelessWidget {
       create: (_) => LiabilityProvider()..loadLiabilities(),
       child: Consumer<LiabilityProvider>(
         builder: (context, provider, _) {
+          final s = S.of(context);
           return Scaffold(
             body: provider.loading
                 ? const Center(child: CircularProgressIndicator())
                 : provider.liabilities.isEmpty
-                    ? _buildEmpty(context)
+                    ? _buildEmpty(context, s)
                     : ListView.builder(
                         padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
                         itemCount: provider.liabilities.length,
@@ -34,7 +36,7 @@ class LiabilitiesScreen extends StatelessWidget {
             floatingActionButton: FloatingActionButton.extended(
               onPressed: () => _showForm(context, provider, null),
               icon: const Icon(Icons.add),
-              label: const Text('添加负债'),
+              label: Text(s.liabilitiesAddLiability),
               backgroundColor: const Color(AppConstants.liabilityColor),
               foregroundColor: Colors.white,
             ),
@@ -44,22 +46,23 @@ class LiabilitiesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmpty(BuildContext context) {
+  Widget _buildEmpty(BuildContext context, S s) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.trending_down, size: 64, color: Colors.grey[300]),
           const SizedBox(height: 16),
-          Text('还没有负债记录', style: TextStyle(fontSize: 16, color: Colors.grey[500])),
+          Text(s.liabilitiesEmpty, style: TextStyle(fontSize: 16, color: Colors.grey[500])),
           const SizedBox(height: 8),
-          Text('点击下方按钮添加负债信息', style: TextStyle(fontSize: 14, color: Colors.grey[400])),
+          Text(s.liabilitiesEmptyHint, style: TextStyle(fontSize: 14, color: Colors.grey[400])),
         ],
       ),
     );
   }
 
   void _showForm(BuildContext context, LiabilityProvider provider, Liability? liability) {
+    final s = S.of(context);
     final nameCtrl = TextEditingController(text: liability?.name ?? '');
     final amountCtrl = TextEditingController(text: liability?.amount.toString() ?? '');
     final rateCtrl = TextEditingController(text: liability?.interestRate?.toString() ?? '');
@@ -84,43 +87,43 @@ class LiabilitiesScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(liability == null ? '添加负债' : '编辑负债',
+                  Text(liability == null ? s.liabilitiesAddLiability : s.liabilitiesEditLiability,
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: nameCtrl,
-                    decoration: const InputDecoration(
-                      labelText: '负债名称', border: OutlineInputBorder(), prefixIcon: Icon(Icons.label)),
+                    decoration: InputDecoration(
+                      labelText: s.liabilitiesName, border: const OutlineInputBorder(), prefixIcon: const Icon(Icons.label)),
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: type,
-                    decoration: const InputDecoration(
-                      labelText: '负债类型', border: OutlineInputBorder(), prefixIcon: Icon(Icons.category)),
-                    items: AppConstants.liabilityTypeLabels.entries.map((e) =>
-                      DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+                    decoration: InputDecoration(
+                      labelText: s.liabilitiesType, border: const OutlineInputBorder(), prefixIcon: const Icon(Icons.category)),
+                    items: AppConstants.liabilityTypes.map((t) =>
+                      DropdownMenuItem(value: t, child: Text(AppConstants.getLiabilityTypeLabel(context, t)))).toList(),
                     onChanged: (v) => setModalState(() => type = v ?? 'other'),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: amountCtrl,
-                    decoration: const InputDecoration(
-                      labelText: '总金额', border: OutlineInputBorder(), prefixIcon: Icon(Icons.monetization_on), suffixText: '元'),
+                    decoration: InputDecoration(
+                      labelText: s.liabilitiesTotalAmount, border: const OutlineInputBorder(), prefixIcon: const Icon(Icons.monetization_on), suffixText: s.currencyYuan),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   ),
                   const SizedBox(height: 12),
                   Row(children: [
                     Expanded(child: TextFormField(
                       controller: rateCtrl,
-                      decoration: const InputDecoration(
-                        labelText: '利率', border: OutlineInputBorder(), suffixText: '%'),
+                      decoration: InputDecoration(
+                        labelText: s.liabilitiesInterestRate, border: const OutlineInputBorder(), suffixText: '%'),
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     )),
                     const SizedBox(width: 12),
                     Expanded(child: TextFormField(
                       controller: paymentCtrl,
-                      decoration: const InputDecoration(
-                        labelText: '月供', border: OutlineInputBorder(), suffixText: '元'),
+                      decoration: InputDecoration(
+                        labelText: s.liabilitiesMonthlyPayment, border: const OutlineInputBorder(), suffixText: s.currencyYuan),
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     )),
                   ]),
@@ -128,15 +131,15 @@ class LiabilitiesScreen extends StatelessWidget {
                   Row(children: [
                     Expanded(child: TextFormField(
                       controller: remainingCtrl,
-                      decoration: const InputDecoration(
-                        labelText: '剩余金额', border: OutlineInputBorder(), suffixText: '元'),
+                      decoration: InputDecoration(
+                        labelText: s.liabilitiesRemainingAmount, border: const OutlineInputBorder(), suffixText: s.currencyYuan),
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     )),
                     const SizedBox(width: 12),
                     Expanded(child: TextFormField(
                       controller: monthsCtrl,
-                      decoration: const InputDecoration(
-                        labelText: '剩余期数', border: OutlineInputBorder(), suffixText: '月'),
+                      decoration: InputDecoration(
+                        labelText: s.liabilitiesRemainingMonths, border: const OutlineInputBorder(), suffixText: s.liabilitiesMonth),
                       keyboardType: TextInputType.number,
                     )),
                   ]),
@@ -163,7 +166,7 @@ class LiabilitiesScreen extends StatelessWidget {
                       }
                       if (ctx.mounted) Navigator.pop(ctx);
                     },
-                    child: Text(liability == null ? '添加负债' : '保存修改'),
+                    child: Text(liability == null ? s.liabilitiesAddLiability : s.btnSave),
                   ),
                 ],
               ),
@@ -175,17 +178,18 @@ class LiabilitiesScreen extends StatelessWidget {
   }
 
   void _confirmDelete(BuildContext context, LiabilityProvider provider, Liability liability) {
+    final s = S.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('确认删除'),
-        content: Text('确定要删除负债「${liability.name}」吗？'),
+        title: Text(s.dialogConfirmDelete),
+        content: Text(s.liabilitiesDeleteConfirm),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(s.btnCancel)),
           TextButton(
             onPressed: () { provider.deleteLiability(liability.id!); Navigator.pop(context); },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('删除'),
+            child: Text(s.btnDelete),
           ),
         ],
       ),
@@ -202,6 +206,7 @@ class _LiabilityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -216,7 +221,7 @@ class _LiabilityCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: Colors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                child: Text(liability.liabilityTypeLabel,
+                child: Text(Liability.getLiabilityTypeLabel(context, liability.liabilityType),
                   style: const TextStyle(fontSize: 12, color: Colors.red)),
               ),
             ]),
@@ -225,7 +230,7 @@ class _LiabilityCard extends StatelessWidget {
               Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('剩余金额', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                  Text(s.liabilitiesRemainingAmount, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
                   Text(Formatters.formatCurrencyFull(liability.remainingAmount ?? liability.amount),
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red)),
                 ],
@@ -233,7 +238,7 @@ class _LiabilityCard extends StatelessWidget {
               if (liability.monthlyPayment != null) Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('月供', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                  Text(s.liabilitiesMonthlyPayment, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
                   Text(Formatters.formatCurrencyFull(liability.monthlyPayment!),
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ],
@@ -250,16 +255,16 @@ class _LiabilityCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text('已还 ${Formatters.formatPercent(liability.progressPercent * 100)}',
+            Text('${s.liabilitiesPaidPercent} ${Formatters.formatPercent(liability.progressPercent * 100)}',
               style: TextStyle(fontSize: 12, color: Colors.grey[500])),
             const Divider(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton.icon(onPressed: onEdit,
-                  icon: const Icon(Icons.edit, size: 18), label: const Text('编辑')),
+                  icon: const Icon(Icons.edit, size: 18), label: Text(s.btnEdit)),
                 TextButton.icon(onPressed: onDelete,
-                  icon: const Icon(Icons.delete_outline, size: 18), label: const Text('删除'),
+                  icon: const Icon(Icons.delete_outline, size: 18), label: Text(s.btnDelete),
                   style: TextButton.styleFrom(foregroundColor: Colors.red)),
               ],
             ),

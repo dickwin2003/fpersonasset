@@ -1,3 +1,6 @@
+import 'package:flutter/widgets.dart';
+import '../l10n/app_localizations.dart';
+
 class Liability {
   final int? id;
   final String userId;
@@ -66,6 +69,7 @@ class Liability {
   }
 
   String get liabilityTypeLabel {
+    // Legacy fallback for non-context usage
     switch (liabilityType) {
       case 'mortgage':
         return '房贷';
@@ -77,6 +81,17 @@ class Liability {
         return '其他';
       default:
         return liabilityType;
+    }
+  }
+
+  static String getLiabilityTypeLabel(BuildContext context, String type) {
+    final s = S.of(context);
+    switch (type) {
+      case 'mortgage': return s.categoryMortgage;
+      case 'car_loan': return s.categoryCarLoan;
+      case 'credit_card': return s.categoryCreditCard;
+      case 'other': return s.categoryOther;
+      default: return type;
     }
   }
 }

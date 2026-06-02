@@ -21,12 +21,29 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    await _createTables(db);
+    await _seedDefaultData(db);
+    await _seedSampleData(db);
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // v1 -> v2: no schema changes, just add sample data if tables are empty
+      final assets = await db.query('assets', where: 'user_id = ?', whereArgs: [AppConstants.defaultUserId]);
+      if (assets.isEmpty) {
+        await _seedSampleData(db);
+      }
+    }
+  }
+
+  Future<void> _createTables(Database db) async {
     await db.execute('''
       CREATE TABLE users (
         user_id TEXT PRIMARY KEY,
@@ -124,11 +141,15 @@ class DatabaseHelper {
     await db.execute('CREATE INDEX idx_asset_history_asset ON asset_value_history(asset_id)');
     await db.execute('CREATE INDEX idx_investment_returns_user ON investment_returns(user_id)');
     await db.execute('CREATE INDEX idx_investment_returns_asset ON investment_returns(asset_id)');
+  }
+
+  Future<void> _seedDefaultData(Database db) async {
+    final uid = AppConstants.defaultUserId;
 
     // 插入默认用户
     final now = DateTime.now().toIso8601String();
     await db.insert('users', {
-      'user_id': AppConstants.defaultUserId,
+      'user_id': uid,
       'username': '默认用户',
       'created_at': now,
       'updated_at': now,
@@ -137,7 +158,7 @@ class DatabaseHelper {
     // 插入默认资产类型
     for (final type in AppConstants.defaultAssetTypes) {
       await db.insert('asset_types', {
-        'user_id': AppConstants.defaultUserId,
+        'user_id': uid,
         'name': type['name'],
         'category': type['category'],
         'description': type['description'],
@@ -146,6 +167,134 @@ class DatabaseHelper {
       });
     }
   }
+
+  Future<void> _seedSampleData(Database db) async {
+    final uid = AppConstants.defaultUserId;
+    final now = DateTime.now();
+
+    // 插入示例资产 (asset_type_id 1-10 对应 defaultAssetTypes 顺序)
+    // 1:现金, 2:股票, 3:房产, 4:基金, 5:债券, 6:汽车, 7:电子产品, 8:家具, 9:贵金属, 10:其他
+    final sampleAssets = [
+      {'name': '自住房产', 'asset_type_id': 3, 'current_value': 2500000.0, 'purchase_value': 2000000.0, 'purchase_date': _yearsAgo(now, 5), 'description': '市区三居室'},
+      {'name': '股票投资', 'asset_type_id': 2, 'current_value': 380000.0, 'purchase_value': 300000.0, 'purchase_date': _yearsAgo(now, 2), 'description': 'A股组合'},
+      {'name': '基金定投', 'asset_type_id': 4, 'current_value': 150000.0, 'purchase_value': 120000.0, 'purchase_date': _yearsAgo(now, 3), 'description': '指数基金定投'},
+      {'name': '活期存款', 'asset_type_id': 1, 'current_value': 85000.0, 'purchase_value': null, 'purchase_date': null, 'description': '银行活期'},
+      {'name': '代步车', 'asset_type_id': 6, 'current_value': 120000.0, 'purchase_value': 180000.0, 'purchase_date': _yearsAgo(now, 2), 'description': '家用轿车'},
+    ];
+
+    for (final a in sampleAssets) {
+      await db.insert('assets', {
+        'user_id': uid,
+        'asset_type_id': a['asset_type_id'],
+        'name': a['name'],
+        'current_value': a['current_value'],
+        'purchase_value': a['purchase_value'],
+        'purchase_date': a['purchase_date'],
+        'description': a['description'],
+      });
+    }
+
+    // 插入示例负债
+    final sampleLiabilities = [
+      {
+        'name': '房贷',
+        'amount': 1800000.0,
+        'interest_rate': 3.8,
+        'monthly_payment': 8400.0,
+        'remaining_months': 216,
+        'remaining_amount': 1500000.0,
+        'start_date': _yearsAgo(now, 5),
+        'end_date': _yearsFromNow(now, 13),
+        'liability_type': 'mortgage',
+      },
+      {
+        'name': '车贷',
+        'amount': 80000.0,
+        'interest_rate': 4.5,
+        'monthly_payment': 3500.0,
+        'remaining_months': 15,
+        'remaining_amount': 45000.0,
+        'start_date': _yearsAgo(now, 2),
+        'end_date': _yearsFromNow(now, 1),
+        'liability_type': 'car_loan',
+      },
+    ];
+
+    for (final l in sampleLiabilities) {
+      await db.insert('liabilities', {
+        'user_id': uid,
+        ...l,
+      });
+    }
+
+    // 插入示例现金流 (近3个月)
+    for (int m = 0; m < 3; m++) {
+      final monthDate = DateTime(now.year, now.month - m, 1);
+      final monthStr = _fmt(monthDate);
+
+      // 月度工资收入
+      await db.insert('cash_flows', {
+        'user_id': uid, 'type': 'income', 'category': 'salary',
+        'amount': 15000.0, 'description': '月工资',
+        'frequency': 'monthly',
+        'start_date': _fmt(DateTime(now.year, now.month - 5, 1)),
+        'end_date': _fmt(DateTime(now.year, now.month + 6, 1)),
+        'date': monthStr,
+      });
+
+      // 月度住房支出
+      await db.insert('cash_flows', {
+        'user_id': uid, 'type': 'expense', 'category': 'housing',
+        'amount': 4000.0, 'description': '房租',
+        'frequency': 'monthly',
+        'start_date': _fmt(DateTime(now.year, now.month - 5, 1)),
+        'end_date': _fmt(DateTime(now.year, now.month + 6, 1)),
+        'date': monthStr,
+      });
+
+      // 餐饮
+      await db.insert('cash_flows', {
+        'user_id': uid, 'type': 'expense', 'category': 'food',
+        'amount': 2500.0, 'description': '日常餐饮',
+        'frequency': 'monthly',
+        'start_date': _fmt(DateTime(now.year, now.month - 5, 1)),
+        'end_date': _fmt(DateTime(now.year, now.month + 6, 1)),
+        'date': monthStr,
+      });
+
+      // 交通
+      await db.insert('cash_flows', {
+        'user_id': uid, 'type': 'expense', 'category': 'transport',
+        'amount': 800.0, 'description': '通勤交通',
+        'frequency': 'monthly',
+        'start_date': _fmt(DateTime(now.year, now.month - 5, 1)),
+        'end_date': _fmt(DateTime(now.year, now.month + 6, 1)),
+        'date': monthStr,
+      });
+    }
+
+    // 一次性：奖金
+    await db.insert('cash_flows', {
+      'user_id': uid, 'type': 'income', 'category': 'bonus',
+      'amount': 30000.0, 'description': '年终奖金',
+      'frequency': 'once',
+      'start_date': null, 'end_date': null,
+      'date': _fmt(DateTime(now.year, now.month - 1, 15)),
+    });
+
+    // 一次性：购物
+    await db.insert('cash_flows', {
+      'user_id': uid, 'type': 'expense', 'category': 'shopping',
+      'amount': 3500.0, 'description': '电子产品',
+      'frequency': 'once',
+      'start_date': null, 'end_date': null,
+      'date': _fmt(DateTime(now.year, now.month - 1, now.day - 14 < 1 ? 1 : now.day - 14)),
+    });
+  }
+
+  String _fmt(DateTime d) => d.toIso8601String().split('T').first;
+  String _yearsAgo(DateTime now, int years) => DateTime(now.year - years, now.month, now.day).toIso8601String().split('T').first;
+  String _yearsFromNow(DateTime now, int years) => DateTime(now.year + years, now.month, now.day).toIso8601String().split('T').first;
 
   // ============ 通用 CRUD ============
 

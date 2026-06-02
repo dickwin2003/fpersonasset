@@ -1,3 +1,6 @@
+import 'package:flutter/widgets.dart';
+import '../l10n/app_localizations.dart';
+
 class CashFlow {
   final int? id;
   final String userId;
@@ -66,6 +69,7 @@ class CashFlow {
   }
 
   String get frequencyLabel {
+    // Legacy fallback for non-context usage
     switch (frequency) {
       case 'once':
         return '一次性';
@@ -83,4 +87,19 @@ class CashFlow {
         return frequency;
     }
   }
+
+  static String getFrequencyLabel(BuildContext context, String frequency) {
+    final s = S.of(context);
+    switch (frequency) {
+      case 'once': return s.frequencyOnce;
+      case 'daily': return s.frequencyDaily;
+      case 'weekly': return s.frequencyWeekly;
+      case 'monthly': return s.frequencyMonthly;
+      case 'quarterly': return s.frequencyQuarterly;
+      case 'yearly': return s.frequencyYearly;
+      default: return frequency;
+    }
+  }
+
+  bool get isRecurring => frequency != 'once';
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/dashboard_provider.dart';
 import '../utils/formatters.dart';
 
@@ -45,13 +46,14 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildMetricCards(BuildContext context, DashboardProvider provider) {
+    final s = S.of(context);
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: _MetricCard(
-                title: '总资产',
+                title: s.dashboardTotalAssets,
                 value: Formatters.formatCurrencyFull(provider.totalAssets),
                 icon: Icons.account_balance_wallet,
                 gradientColors: [const Color(0xFF42A5F5), const Color(0xFF1976D2)],
@@ -60,7 +62,7 @@ class DashboardScreen extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _MetricCard(
-                title: '总负债',
+                title: s.dashboardTotalLiabilities,
                 value: Formatters.formatCurrencyFull(provider.totalLiabilities),
                 icon: Icons.trending_down,
                 gradientColors: [const Color(0xFFEF5350), const Color(0xFFC62828)],
@@ -70,7 +72,7 @@ class DashboardScreen extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         _MetricCard(
-          title: '净资产',
+          title: s.dashboardNetWorth,
           value: Formatters.formatCurrencyFull(provider.netWorth),
           icon: Icons.savings,
           gradientColors: [const Color(0xFF66BB6A), const Color(0xFF2E7D32)],
@@ -80,33 +82,34 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildMonthlySummary(BuildContext context, DashboardProvider provider) {
+    final s = S.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('本月收支', style: Theme.of(context).textTheme.titleMedium),
+            Text(s.dashboardMonthlySummary, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: _SummaryItem(
-                    label: '收入',
+                    label: s.dashboardIncome,
                     value: Formatters.formatCurrencyFull(provider.monthIncome),
                     color: Colors.green,
                   ),
                 ),
                 Expanded(
                   child: _SummaryItem(
-                    label: '支出',
+                    label: s.dashboardExpense,
                     value: Formatters.formatCurrencyFull(provider.monthExpense),
                     color: Colors.red,
                   ),
                 ),
                 Expanded(
                   child: _SummaryItem(
-                    label: '净额',
+                    label: s.dashboardNetAmount,
                     value: Formatters.formatCurrencyFull(provider.monthNetCashFlow),
                     color: provider.monthNetCashFlow >= 0 ? Colors.green : Colors.red,
                   ),
@@ -120,6 +123,7 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildTrendChart(BuildContext context, DashboardProvider provider) {
+    final s = S.of(context);
     final data = provider.monthlyTrend.reversed.toList();
     return Card(
       child: Padding(
@@ -127,7 +131,7 @@ class DashboardScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('12个月收支趋势', style: Theme.of(context).textTheme.titleMedium),
+            Text(s.dashboardTrend12Months, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             SizedBox(
               height: 200,
@@ -192,9 +196,9 @@ class DashboardScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _Legend(color: Colors.green, label: '收入'),
+                _Legend(color: Colors.green, label: s.dashboardIncome),
                 const SizedBox(width: 16),
-                _Legend(color: Colors.red, label: '支出'),
+                _Legend(color: Colors.red, label: s.dashboardExpense),
               ],
             ),
           ],
@@ -204,6 +208,7 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildDistributionChart(BuildContext context, DashboardProvider provider) {
+    final s = S.of(context);
     final data = provider.assetDistribution;
     final total = data.fold(0.0, (sum, d) => sum + (d['total'] as num).toDouble());
 
@@ -221,7 +226,7 @@ class DashboardScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('资产分布', style: Theme.of(context).textTheme.titleMedium),
+            Text(s.dashboardAssetDistribution, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             SizedBox(
               height: 200,
@@ -287,6 +292,7 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildReturnChart(BuildContext context, DashboardProvider provider) {
+    final s = S.of(context);
     final data = provider.assetReturns;
     return Card(
       child: Padding(
@@ -294,7 +300,7 @@ class DashboardScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('资产收益率', style: Theme.of(context).textTheme.titleMedium),
+            Text(s.dashboardAssetReturnRate, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             SizedBox(
               height: (data.length * 40.0).clamp(80, 300),

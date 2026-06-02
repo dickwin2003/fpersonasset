@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/cash_flow_provider.dart';
 import '../models/cash_flow.dart';
 import '../utils/constants.dart';
@@ -14,15 +15,16 @@ class CashFlowScreen extends StatelessWidget {
       create: (_) => CashFlowProvider()..loadCashFlows(),
       child: Consumer<CashFlowProvider>(
         builder: (context, provider, _) {
+          final s = S.of(context);
           return DefaultTabController(
             length: 2,
             child: Scaffold(
               appBar: AppBar(
-                title: const Text('资金流'),
-                bottom: const TabBar(
+                title: Text(s.cashFlowTitle),
+                bottom: TabBar(
                   tabs: [
-                    Tab(text: '预期收支'),
-                    Tab(text: '历史记录'),
+                    Tab(text: s.cashFlowPlannedTab),
+                    Tab(text: s.cashFlowHistoricalTab),
                   ],
                 ),
               ),
@@ -35,7 +37,7 @@ class CashFlowScreen extends StatelessWidget {
               floatingActionButton: FloatingActionButton.extended(
                 onPressed: () => _showForm(context, provider, null),
                 icon: const Icon(Icons.add),
-                label: const Text('添加记录'),
+                label: Text(s.cashFlowAddRecord),
                 backgroundColor: Colors.purple,
                 foregroundColor: Colors.white,
               ),
@@ -47,6 +49,7 @@ class CashFlowScreen extends StatelessWidget {
   }
 
   Widget _buildPlannedList(BuildContext context, CashFlowProvider provider) {
+    final s = S.of(context);
     final items = provider.planned;
     if (items.isEmpty) {
       return Center(
@@ -55,7 +58,7 @@ class CashFlowScreen extends StatelessWidget {
           children: [
             Icon(Icons.event_note, size: 64, color: Colors.grey[300]),
             const SizedBox(height: 16),
-            Text('暂无预期收支', style: TextStyle(color: Colors.grey[500])),
+            Text(s.cashFlowEmptyPlanned, style: TextStyle(color: Colors.grey[500])),
           ],
         ),
       );
@@ -72,6 +75,7 @@ class CashFlowScreen extends StatelessWidget {
   }
 
   Widget _buildHistoricalList(BuildContext context, CashFlowProvider provider) {
+    final s = S.of(context);
     final items = provider.historical;
     if (items.isEmpty) {
       return Center(
@@ -80,7 +84,7 @@ class CashFlowScreen extends StatelessWidget {
           children: [
             Icon(Icons.history, size: 64, color: Colors.grey[300]),
             const SizedBox(height: 16),
-            Text('暂无历史记录', style: TextStyle(color: Colors.grey[500])),
+            Text(s.cashFlowEmptyHistorical, style: TextStyle(color: Colors.grey[500])),
           ],
         ),
       );
@@ -110,16 +114,16 @@ class CashFlowScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('收支汇总', style: Theme.of(context).textTheme.titleMedium),
+                Text(s.cashFlowSummary, style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(child: _SummaryChip(
-                      label: '总收入',
+                      label: s.cashFlowTotalIncome,
                       value: Formatters.formatCurrency(provider.totalIncome),
                       color: Colors.green)),
                     Expanded(child: _SummaryChip(
-                      label: '总支出',
+                      label: s.cashFlowTotalExpense,
                       value: Formatters.formatCurrency(provider.totalExpense),
                       color: Colors.red)),
                   ],
@@ -139,12 +143,15 @@ class CashFlowScreen extends StatelessWidget {
   }
 
   void _showForm(BuildContext context, CashFlowProvider provider, CashFlow? cashFlow) {
+    final s = S.of(context);
     final descCtrl = TextEditingController(text: cashFlow?.description ?? '');
     final amountCtrl = TextEditingController(text: cashFlow != null ? cashFlow.displayAmount.toString() : '');
     String type = cashFlow?.type ?? 'income';
-    String category = cashFlow?.category ?? AppConstants.incomeCategories.first;
+    String category = cashFlow?.category ?? AppConstants.incomeCategoryKeys.first;
     String frequency = cashFlow?.frequency ?? 'once';
     DateTime? date = cashFlow?.date != null ? DateTime.tryParse(cashFlow!.date!) : DateTime.now();
+    DateTime? startDate = cashFlow?.startDate != null ? DateTime.tryParse(cashFlow!.startDate!) : DateTime.now();
+    DateTime? endDate = cashFlow?.endDate != null ? DateTime.tryParse(cashFlow!.endDate!) : null;
 
     showModalBottomSheet(
       context: context,
@@ -152,10 +159,11 @@ class CashFlowScreen extends StatelessWidget {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) {
         return StatefulBuilder(builder: (ctx, setModalState) {
-          final categories = type == 'income' ? AppConstants.incomeCategories : AppConstants.expenseCategories;
+          final categories = type == 'income' ? AppConstants.incomeCategoryKeys : AppConstants.expenseCategoryKeys;
           if (!categories.contains(category)) {
             category = categories.first;
           }
+          final isRecurring = frequency != 'once';
 
           return Padding(
             padding: EdgeInsets.only(left: 16, right: 16, top: 16,
@@ -165,29 +173,29 @@ class CashFlowScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(cashFlow == null ? '添加记录' : '编辑记录',
+                  Text(cashFlow == null ? s.cashFlowAddRecord : s.cashFlowEditRecord,
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   // 收入/支出切换
                   Row(
                     children: [
                       Expanded(child: ChoiceChip(
-                        label: const Text('收入'),
+                        label: Text(s.cashFlowIncome),
                         selected: type == 'income',
                         selectedColor: Colors.green.withValues(alpha: 0.2),
                         onSelected: (_) => setModalState(() {
                           type = 'income';
-                          category = AppConstants.incomeCategories.first;
+                          category = AppConstants.incomeCategoryKeys.first;
                         }),
                       )),
                       const SizedBox(width: 12),
                       Expanded(child: ChoiceChip(
-                        label: const Text('支出'),
+                        label: Text(s.cashFlowExpense),
                         selected: type == 'expense',
                         selectedColor: Colors.red.withValues(alpha: 0.2),
                         onSelected: (_) => setModalState(() {
                           type = 'expense';
-                          category = AppConstants.expenseCategories.first;
+                          category = AppConstants.expenseCategoryKeys.first;
                         }),
                       )),
                     ],
@@ -195,52 +203,98 @@ class CashFlowScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: category,
-                    decoration: const InputDecoration(
-                      labelText: '分类', border: OutlineInputBorder(), prefixIcon: Icon(Icons.category)),
-                    items: categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                    decoration: InputDecoration(
+                      labelText: s.cashFlowCategory, border: const OutlineInputBorder(), prefixIcon: const Icon(Icons.category)),
+                    items: categories.map((c) {
+                      final label = type == 'income'
+                          ? AppConstants.getIncomeCategoryLabel(context, c)
+                          : AppConstants.getExpenseCategoryLabel(context, c);
+                      return DropdownMenuItem(value: c, child: Text(label));
+                    }).toList(),
                     onChanged: (v) => setModalState(() => category = v ?? categories.first),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: amountCtrl,
-                    decoration: const InputDecoration(
-                      labelText: '金额', border: OutlineInputBorder(), prefixIcon: Icon(Icons.monetization_on), suffixText: '元'),
+                    decoration: InputDecoration(
+                      labelText: s.cashFlowAmount, border: const OutlineInputBorder(), prefixIcon: const Icon(Icons.monetization_on), suffixText: s.currencyYuan),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: descCtrl,
-                    decoration: const InputDecoration(
-                      labelText: '描述', border: OutlineInputBorder(), prefixIcon: Icon(Icons.description)),
+                    decoration: InputDecoration(
+                      labelText: s.cashFlowDescription, border: const OutlineInputBorder(), prefixIcon: const Icon(Icons.description)),
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: frequency,
-                    decoration: const InputDecoration(
-                      labelText: '频率', border: OutlineInputBorder(), prefixIcon: Icon(Icons.repeat)),
-                    items: AppConstants.frequencyLabels.entries.map((e) =>
-                      DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+                    decoration: InputDecoration(
+                      labelText: s.cashFlowFrequency, border: const OutlineInputBorder(), prefixIcon: const Icon(Icons.repeat)),
+                    items: AppConstants.frequencyKeys.map((f) =>
+                      DropdownMenuItem(value: f, child: Text(CashFlow.getFrequencyLabel(context, f)))).toList(),
                     onChanged: (v) => setModalState(() => frequency = v ?? 'once'),
                   ),
                   const SizedBox(height: 12),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.calendar_today),
-                    title: Text(date == null ? '选择日期' : Formatters.formatDate(date.toString())),
-                    trailing: const Icon(Icons.chevron_right),
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.grey[400]!),
-                      borderRadius: BorderRadius.circular(8)),
-                    onTap: () async {
-                      final d = await showDatePicker(
-                        context: ctx,
-                        initialDate: date ?? DateTime.now(),
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2030),
-                      );
-                      if (d != null) setModalState(() => date = d);
-                    },
-                  ),
+                  // Date pickers: single date for once, start+end for recurring
+                  if (!isRecurring) ...[
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.calendar_today),
+                      title: Text(date == null ? s.cashFlowSelectDate : Formatters.formatDate(date.toString())),
+                      trailing: const Icon(Icons.chevron_right),
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.grey[400]!),
+                        borderRadius: BorderRadius.circular(8)),
+                      onTap: () async {
+                        final d = await showDatePicker(
+                          context: ctx,
+                          initialDate: date ?? DateTime.now(),
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2030),
+                        );
+                        if (d != null) setModalState(() => date = d);
+                      },
+                    ),
+                  ] else ...[
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.play_arrow),
+                      title: Text(startDate == null ? s.cashFlowStartDate : Formatters.formatDate(startDate.toString())),
+                      trailing: const Icon(Icons.chevron_right),
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.grey[400]!),
+                        borderRadius: BorderRadius.circular(8)),
+                      onTap: () async {
+                        final d = await showDatePicker(
+                          context: ctx,
+                          initialDate: startDate ?? DateTime.now(),
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2030),
+                        );
+                        if (d != null) setModalState(() => startDate = d);
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.stop),
+                      title: Text(endDate == null ? s.cashFlowEndDate : Formatters.formatDate(endDate.toString())),
+                      trailing: const Icon(Icons.chevron_right),
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.grey[400]!),
+                        borderRadius: BorderRadius.circular(8)),
+                      onTap: () async {
+                        final d = await showDatePicker(
+                          context: ctx,
+                          initialDate: endDate ?? startDate ?? DateTime.now(),
+                          firstDate: startDate ?? DateTime(2020),
+                          lastDate: DateTime(2040),
+                        );
+                        if (d != null) setModalState(() => endDate = d);
+                      },
+                    ),
+                  ],
                   const SizedBox(height: 20),
                   FilledButton(
                     onPressed: () async {
@@ -252,7 +306,9 @@ class CashFlowScreen extends StatelessWidget {
                         amount: double.tryParse(amountCtrl.text) ?? 0,
                         description: descCtrl.text.trim().isEmpty ? null : descCtrl.text.trim(),
                         frequency: frequency,
-                        date: date?.toIso8601String().split('T').first,
+                        date: !isRecurring ? date?.toIso8601String().split('T').first : null,
+                        startDate: isRecurring ? startDate?.toIso8601String().split('T').first : null,
+                        endDate: isRecurring ? endDate?.toIso8601String().split('T').first : null,
                       );
                       if (cashFlow == null) {
                         await provider.addCashFlow(data);
@@ -261,7 +317,7 @@ class CashFlowScreen extends StatelessWidget {
                       }
                       if (ctx.mounted) Navigator.pop(ctx);
                     },
-                    child: Text(cashFlow == null ? '添加记录' : '保存修改'),
+                    child: Text(cashFlow == null ? s.cashFlowAddRecord : s.cashFlowSaveRecord),
                   ),
                 ],
               ),
@@ -273,17 +329,18 @@ class CashFlowScreen extends StatelessWidget {
   }
 
   void _confirmDelete(BuildContext context, CashFlowProvider provider, CashFlow cashFlow) {
+    final s = S.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('确认删除'),
-        content: Text('确定要删除这条${cashFlow.isIncome ? '收入' : '支出'}记录吗？'),
+        title: Text(s.dialogConfirmDelete),
+        content: Text(s.cashFlowDeleteConfirm(cashFlow.isIncome ? s.cashFlowIncome : s.cashFlowExpense)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(s.btnCancel)),
           TextButton(
             onPressed: () { provider.deleteCashFlow(cashFlow.id!); Navigator.pop(context); },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('删除'),
+            child: Text(s.btnDelete),
           ),
         ],
       ),
@@ -300,7 +357,25 @@ class _CashFlowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     final isIncome = cashFlow.isIncome;
+    final isRecurring = cashFlow.isRecurring;
+
+    // Build date subtitle
+    String dateText = '';
+    if (isRecurring) {
+      if (cashFlow.startDate != null && cashFlow.endDate != null) {
+        dateText = ' · ${Formatters.formatDate(cashFlow.startDate!)} ~ ${Formatters.formatDate(cashFlow.endDate!)}';
+      } else if (cashFlow.startDate != null) {
+        dateText = ' · ${Formatters.formatDate(cashFlow.startDate!)} ~';
+      }
+    } else if (cashFlow.date != null) {
+      dateText = ' · ${Formatters.formatDate(cashFlow.date!)}';
+    }
+
+    final categoryLabel = AppConstants.getCategoryLabelByType(context, cashFlow.category, cashFlow.type);
+    final freqLabel = CashFlow.getFrequencyLabel(context, cashFlow.frequency);
+
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -309,9 +384,8 @@ class _CashFlowCard extends StatelessWidget {
           child: Icon(isIncome ? Icons.arrow_upward : Icons.arrow_downward,
             color: isIncome ? Colors.green : Colors.red, size: 20),
         ),
-        title: Text(cashFlow.description ?? cashFlow.category),
-        subtitle: Text('${cashFlow.category} · ${cashFlow.frequencyLabel}'
-          '${cashFlow.date != null ? ' · ${Formatters.formatDate(cashFlow.date!)}' : ''}'),
+        title: Text(cashFlow.description ?? categoryLabel),
+        subtitle: Text('$categoryLabel · $freqLabel$dateText'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -324,8 +398,8 @@ class _CashFlowCard extends StatelessWidget {
             ),
             PopupMenuButton(
               itemBuilder: (_) => [
-                const PopupMenuItem(value: 'edit', child: Text('编辑')),
-                const PopupMenuItem(value: 'delete', child: Text('删除')),
+                PopupMenuItem(value: 'edit', child: Text(s.btnEdit)),
+                PopupMenuItem(value: 'delete', child: Text(s.btnDelete)),
               ],
               onSelected: (v) {
                 if (v == 'edit') onEdit();
