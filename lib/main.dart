@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/locale_provider.dart';
+import 'providers/password_provider.dart';
 import 'screens/home_screen.dart';
+import 'screens/lock_screen.dart';
 import 'utils/constants.dart';
 
 void main() {
@@ -14,8 +16,11 @@ void main() {
     statusBarIconBrightness: Brightness.light,
   ));
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => LocaleProvider()..init(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LocaleProvider()..init()),
+        ChangeNotifierProvider(create: (_) => PasswordProvider()..init()),
+      ],
       child: const JuCaiApp(),
     ),
   );
@@ -26,8 +31,8 @@ class JuCaiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<LocaleProvider>(
-      builder: (context, localeProvider, _) {
+    return Consumer2<LocaleProvider, PasswordProvider>(
+      builder: (context, localeProvider, passwordProvider, _) {
         return MaterialApp(
           title: AppConstants.appName,
           debugShowCheckedModeBanner: false,
@@ -60,7 +65,11 @@ class JuCaiApp extends StatelessWidget {
               ),
             ),
           ),
-          home: const HomeScreen(),
+          home: passwordProvider.isLoading
+              ? const Scaffold(body: Center(child: CircularProgressIndicator()))
+              : passwordProvider.isLocked
+                  ? LockScreen(passwordProvider: passwordProvider)
+                  : const HomeScreen(),
         );
       },
     );

@@ -21,7 +21,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -39,6 +39,23 @@ class DatabaseHelper {
       final assets = await db.query('assets', where: 'user_id = ?', whereArgs: [AppConstants.defaultUserId]);
       if (assets.isEmpty) {
         await _seedSampleData(db);
+      }
+    }
+    if (oldVersion < 3) {
+      // v2 -> v3: add new asset types (外汇、数字货币、保险、养老金、收藏品、商业地产、定期存款、股权投资)
+      final existingNames = (await db.query('asset_types', columns: ['name'], where: 'user_id = ?',
+          whereArgs: [AppConstants.defaultUserId])).map((r) => r['name'] as String).toSet();
+
+      final newTypes = AppConstants.defaultAssetTypes.where((t) => !existingNames.contains(t['name'])).toList();
+      for (final type in newTypes) {
+        await db.insert('asset_types', {
+          'user_id': AppConstants.defaultUserId,
+          'name': type['name'],
+          'category': type['category'],
+          'description': type['description'],
+          'has_depreciation': type['has_depreciation'] ? 1 : 0,
+          'depreciation_rate': type['depreciation_rate'],
+        });
       }
     }
   }
@@ -172,14 +189,17 @@ class DatabaseHelper {
     final uid = AppConstants.defaultUserId;
     final now = DateTime.now();
 
-    // 插入示例资产 (asset_type_id 1-10 对应 defaultAssetTypes 顺序)
-    // 1:现金, 2:股票, 3:房产, 4:基金, 5:债券, 6:汽车, 7:电子产品, 8:家具, 9:贵金属, 10:其他
+    // 插入示例资产 (asset_type_id 1-18 对应 defaultAssetTypes 顺序)
+    // 1:现金, 2:定期存款, 3:股票, 4:基金, 5:债券, 6:外汇, 7:数字货币,
+    // 8:贵金属, 9:保险, 10:股权投资, 11:房产, 12:商业地产, 13:养老金,
+    // 14:汽车, 15:电子产品, 16:家具, 17:收藏品, 18:其他
     final sampleAssets = [
-      {'name': '自住房产', 'asset_type_id': 3, 'current_value': 2500000.0, 'purchase_value': 2000000.0, 'purchase_date': _yearsAgo(now, 5), 'description': '市区三居室'},
-      {'name': '股票投资', 'asset_type_id': 2, 'current_value': 380000.0, 'purchase_value': 300000.0, 'purchase_date': _yearsAgo(now, 2), 'description': 'A股组合'},
+      {'name': '自住房产', 'asset_type_id': 11, 'current_value': 2500000.0, 'purchase_value': 2000000.0, 'purchase_date': _yearsAgo(now, 5), 'description': '市区三居室'},
+      {'name': '股票投资', 'asset_type_id': 3, 'current_value': 380000.0, 'purchase_value': 300000.0, 'purchase_date': _yearsAgo(now, 2), 'description': 'A股组合'},
       {'name': '基金定投', 'asset_type_id': 4, 'current_value': 150000.0, 'purchase_value': 120000.0, 'purchase_date': _yearsAgo(now, 3), 'description': '指数基金定投'},
       {'name': '活期存款', 'asset_type_id': 1, 'current_value': 85000.0, 'purchase_value': null, 'purchase_date': null, 'description': '银行活期'},
-      {'name': '代步车', 'asset_type_id': 6, 'current_value': 120000.0, 'purchase_value': 180000.0, 'purchase_date': _yearsAgo(now, 2), 'description': '家用轿车'},
+      {'name': '比特币', 'asset_type_id': 7, 'current_value': 260000.0, 'purchase_value': 180000.0, 'purchase_date': _yearsAgo(now, 1), 'description': 'BTC长期持有'},
+      {'name': '代步车', 'asset_type_id': 14, 'current_value': 120000.0, 'purchase_value': 180000.0, 'purchase_date': _yearsAgo(now, 2), 'description': '家用轿车'},
     ];
 
     for (final a in sampleAssets) {

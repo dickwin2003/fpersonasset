@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/user_provider.dart';
 import '../providers/locale_provider.dart';
+import '../providers/password_provider.dart';
 import '../database/database_helper.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -21,6 +22,7 @@ class SettingsScreen extends StatelessWidget {
           final user = provider.user;
           final s = S.of(context);
           final localeProvider = Provider.of<LocaleProvider>(context);
+          final passwordProvider = Provider.of<PasswordProvider>(context);
           return Scaffold(
             appBar: AppBar(title: Text(s.settingsTitle)),
             body: ListView(
@@ -97,6 +99,44 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // 安全设置 - 应用锁
+                Card(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                        child: Text(s.settingsSecurity, style: Theme.of(context).textTheme.titleMedium),
+                      ),
+                      if (!passwordProvider.hasPassword)
+                        ListTile(
+                          leading: const Icon(Icons.lock_outline, color: Colors.orange),
+                          title: Text(s.settingsSetPassword),
+                          subtitle: Text(s.settingsAppLockHint),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => _showSetPasswordDialog(context, passwordProvider),
+                        )
+                      else ...[
+                        SwitchListTile(
+                          secondary: const Icon(Icons.lock, color: Colors.green),
+                          title: Text(s.settingsAppLock),
+                          subtitle: Text(s.settingsAppLockHint),
+                          value: true,
+                          onChanged: (v) {
+                            if (!v) _showRemovePasswordDialog(context, passwordProvider);
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.key, color: Colors.blue),
+                          title: Text(s.settingsChangePassword),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => _showChangePasswordDialog(context, passwordProvider),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
                 // 数据管理
                 Card(
                   child: Column(
@@ -125,6 +165,8 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  // ============ 语言选择 ============
+
   void _showLanguagePicker(BuildContext context, LocaleProvider provider) {
     final s = S.of(context);
     showDialog(
@@ -152,6 +194,199 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
+
+  // ============ 密码设置 ============
+
+  void _showSetPasswordDialog(BuildContext context, PasswordProvider provider) {
+    final s = S.of(context);
+    final ctrl1 = TextEditingController();
+    final ctrl2 = TextEditingController();
+    String? error;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(builder: (ctx, setDialogState) {
+        return AlertDialog(
+          title: Text(s.lockSetPassword),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: ctrl1,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                decoration: InputDecoration(
+                  labelText: s.lockEnterPassword,
+                  border: const OutlineInputBorder(),
+                  counterText: '',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: ctrl2,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                decoration: InputDecoration(
+                  labelText: s.lockConfirmPassword,
+                  border: const OutlineInputBorder(),
+                  counterText: '',
+                ),
+              ),
+              if (error != null) ...[
+                const SizedBox(height: 8),
+                Text(error!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(s.btnCancel)),
+            FilledButton(
+              onPressed: () async {
+                if (ctrl1.text.length < 4) {
+                  setDialogState(() => error = s.lockEnterPassword);
+                  return;
+                }
+                if (ctrl1.text != ctrl2.text) {
+                  setDialogState(() => error = s.lockPasswordMismatch);
+                  return;
+                }
+                await provider.setPassword(ctrl1.text);
+                if (ctx.mounted) {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(s.lockPasswordSet), backgroundColor: Colors.green),
+                  );
+                }
+              },
+              child: Text(s.lockSetPassword),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  void _showChangePasswordDialog(BuildContext context, PasswordProvider provider) {
+    final s = S.of(context);
+    final oldCtrl = TextEditingController();
+    final newCtrl = TextEditingController();
+    final confirmCtrl = TextEditingController();
+    String? error;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(builder: (ctx, setDialogState) {
+        return AlertDialog(
+          title: Text(s.lockChangePassword),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: oldCtrl,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                decoration: InputDecoration(
+                  labelText: s.lockOldPassword,
+                  border: const OutlineInputBorder(),
+                  counterText: '',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: newCtrl,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                decoration: InputDecoration(
+                  labelText: s.lockNewPassword,
+                  border: const OutlineInputBorder(),
+                  counterText: '',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: confirmCtrl,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                decoration: InputDecoration(
+                  labelText: s.lockConfirmNewPassword,
+                  border: const OutlineInputBorder(),
+                  counterText: '',
+                ),
+              ),
+              if (error != null) ...[
+                const SizedBox(height: 8),
+                Text(error!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(s.btnCancel)),
+            FilledButton(
+              onPressed: () async {
+                final oldOk = await provider.verifyPassword(oldCtrl.text);
+                if (!oldOk) {
+                  setDialogState(() => error = s.lockOldPasswordWrong);
+                  return;
+                }
+                if (newCtrl.text.length < 4) {
+                  setDialogState(() => error = s.lockNewPassword);
+                  return;
+                }
+                if (newCtrl.text != confirmCtrl.text) {
+                  setDialogState(() => error = s.lockPasswordMismatch);
+                  return;
+                }
+                await provider.setPassword(newCtrl.text);
+                if (ctx.mounted) {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(s.lockPasswordChanged), backgroundColor: Colors.green),
+                  );
+                }
+              },
+              child: Text(s.dialogConfirm),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  void _showRemovePasswordDialog(BuildContext context, PasswordProvider provider) {
+    final s = S.of(context);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(s.lockRemovePassword),
+        content: Text(s.settingsRemovePasswordConfirm),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(s.btnCancel)),
+          TextButton(
+            onPressed: () async {
+              await provider.removePassword();
+              if (ctx.mounted) {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(s.lockPasswordRemoved), backgroundColor: Colors.orange),
+                );
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(s.dialogConfirm),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============ 数据管理 ============
 
   Future<void> _exportData(BuildContext context) async {
     final s = S.of(context);

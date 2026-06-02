@@ -1110,6 +1110,144 @@ abstract class S {
   /// In zh_CN, this message translates to:
   /// **'其他支出'**
   String get expenseOther;
+
+  /// No description provided for @lockTitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'输入密码'**
+  String get lockTitle;
+
+  /// No description provided for @lockSubtitle.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请输入密码解锁应用'**
+  String get lockSubtitle;
+
+  /// No description provided for @lockWrongPassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'密码错误，请重试'**
+  String get lockWrongPassword;
+
+  /// No description provided for @lockEnterPassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请输入密码'**
+  String get lockEnterPassword;
+
+  /// No description provided for @lockConfirmPassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请再次输入密码'**
+  String get lockConfirmPassword;
+
+  /// No description provided for @lockPasswordMismatch.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'两次密码不一致'**
+  String get lockPasswordMismatch;
+
+  /// No description provided for @lockSetPassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'设置密码'**
+  String get lockSetPassword;
+
+  /// No description provided for @lockChangePassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'修改密码'**
+  String get lockChangePassword;
+
+  /// No description provided for @lockRemovePassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关闭密码锁'**
+  String get lockRemovePassword;
+
+  /// No description provided for @lockPasswordSet.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'密码锁已开启'**
+  String get lockPasswordSet;
+
+  /// No description provided for @lockPasswordRemoved.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'密码锁已关闭'**
+  String get lockPasswordRemoved;
+
+  /// No description provided for @lockOldPassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请输入旧密码'**
+  String get lockOldPassword;
+
+  /// No description provided for @lockNewPassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请输入新密码'**
+  String get lockNewPassword;
+
+  /// No description provided for @lockConfirmNewPassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'请再次输入新密码'**
+  String get lockConfirmNewPassword;
+
+  /// No description provided for @lockPasswordChanged.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'密码修改成功'**
+  String get lockPasswordChanged;
+
+  /// No description provided for @lockOldPasswordWrong.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'旧密码错误'**
+  String get lockOldPasswordWrong;
+
+  /// No description provided for @settingsSecurity.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'安全设置'**
+  String get settingsSecurity;
+
+  /// No description provided for @settingsAppLock.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'应用锁'**
+  String get settingsAppLock;
+
+  /// No description provided for @settingsAppLockHint.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'打开应用时需要输入密码'**
+  String get settingsAppLockHint;
+
+  /// No description provided for @settingsSetPassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'设置应用密码'**
+  String get settingsSetPassword;
+
+  /// No description provided for @settingsChangePassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'修改应用密码'**
+  String get settingsChangePassword;
+
+  /// No description provided for @settingsRemovePassword.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'关闭应用密码'**
+  String get settingsRemovePassword;
+
+  /// No description provided for @settingsRemovePasswordConfirm.
+  ///
+  /// In zh_CN, this message translates to:
+  /// **'确定要关闭应用密码吗？关闭后任何人都可以访问您的财务数据。'**
+  String get settingsRemovePasswordConfirm;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

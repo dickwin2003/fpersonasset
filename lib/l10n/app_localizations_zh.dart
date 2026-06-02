@@ -514,6 +514,75 @@ class SZh extends S {
 
   @override
   String get expenseOther => '其他支出';
+
+  @override
+  String get lockTitle => '输入密码';
+
+  @override
+  String get lockSubtitle => '请输入密码解锁应用';
+
+  @override
+  String get lockWrongPassword => '密码错误，请重试';
+
+  @override
+  String get lockEnterPassword => '请输入密码';
+
+  @override
+  String get lockConfirmPassword => '请再次输入密码';
+
+  @override
+  String get lockPasswordMismatch => '两次密码不一致';
+
+  @override
+  String get lockSetPassword => '设置密码';
+
+  @override
+  String get lockChangePassword => '修改密码';
+
+  @override
+  String get lockRemovePassword => '关闭密码锁';
+
+  @override
+  String get lockPasswordSet => '密码锁已开启';
+
+  @override
+  String get lockPasswordRemoved => '密码锁已关闭';
+
+  @override
+  String get lockOldPassword => '请输入旧密码';
+
+  @override
+  String get lockNewPassword => '请输入新密码';
+
+  @override
+  String get lockConfirmNewPassword => '请再次输入新密码';
+
+  @override
+  String get lockPasswordChanged => '密码修改成功';
+
+  @override
+  String get lockOldPasswordWrong => '旧密码错误';
+
+  @override
+  String get settingsSecurity => '安全设置';
+
+  @override
+  String get settingsAppLock => '应用锁';
+
+  @override
+  String get settingsAppLockHint => '打开应用时需要输入密码';
+
+  @override
+  String get settingsSetPassword => '设置应用密码';
+
+  @override
+  String get settingsChangePassword => '修改应用密码';
+
+  @override
+  String get settingsRemovePassword => '关闭应用密码';
+
+  @override
+  String get settingsRemovePasswordConfirm => '确定要关闭应用密码吗？关闭后任何人都可以访问您的财务数据。';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1026,6 +1095,75 @@ class SZhCn extends SZh {
 
   @override
   String get expenseOther => '其他支出';
+
+  @override
+  String get lockTitle => '输入密码';
+
+  @override
+  String get lockSubtitle => '请输入密码解锁应用';
+
+  @override
+  String get lockWrongPassword => '密码错误，请重试';
+
+  @override
+  String get lockEnterPassword => '请输入密码';
+
+  @override
+  String get lockConfirmPassword => '请再次输入密码';
+
+  @override
+  String get lockPasswordMismatch => '两次密码不一致';
+
+  @override
+  String get lockSetPassword => '设置密码';
+
+  @override
+  String get lockChangePassword => '修改密码';
+
+  @override
+  String get lockRemovePassword => '关闭密码锁';
+
+  @override
+  String get lockPasswordSet => '密码锁已开启';
+
+  @override
+  String get lockPasswordRemoved => '密码锁已关闭';
+
+  @override
+  String get lockOldPassword => '请输入旧密码';
+
+  @override
+  String get lockNewPassword => '请输入新密码';
+
+  @override
+  String get lockConfirmNewPassword => '请再次输入新密码';
+
+  @override
+  String get lockPasswordChanged => '密码修改成功';
+
+  @override
+  String get lockOldPasswordWrong => '旧密码错误';
+
+  @override
+  String get settingsSecurity => '安全设置';
+
+  @override
+  String get settingsAppLock => '应用锁';
+
+  @override
+  String get settingsAppLockHint => '打开应用时需要输入密码';
+
+  @override
+  String get settingsSetPassword => '设置应用密码';
+
+  @override
+  String get settingsChangePassword => '修改应用密码';
+
+  @override
+  String get settingsRemovePassword => '关闭应用密码';
+
+  @override
+  String get settingsRemovePasswordConfirm => '确定要关闭应用密码吗？关闭后任何人都可以访问您的财务数据。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -1538,4 +1676,73 @@ class SZhTw extends SZh {
 
   @override
   String get expenseOther => '其他支出';
+
+  @override
+  String get lockTitle => '輸入密碼';
+
+  @override
+  String get lockSubtitle => '請輸入密碼解鎖應用';
+
+  @override
+  String get lockWrongPassword => '密碼錯誤，請重試';
+
+  @override
+  String get lockEnterPassword => '請輸入密碼';
+
+  @override
+  String get lockConfirmPassword => '請再次輸入密碼';
+
+  @override
+  String get lockPasswordMismatch => '兩次密碼不一致';
+
+  @override
+  String get lockSetPassword => '設定密碼';
+
+  @override
+  String get lockChangePassword => '修改密碼';
+
+  @override
+  String get lockRemovePassword => '關閉密碼鎖';
+
+  @override
+  String get lockPasswordSet => '密碼鎖已開啟';
+
+  @override
+  String get lockPasswordRemoved => '密碼鎖已關閉';
+
+  @override
+  String get lockOldPassword => '請輸入舊密碼';
+
+  @override
+  String get lockNewPassword => '請輸入新密碼';
+
+  @override
+  String get lockConfirmNewPassword => '請再次輸入新密碼';
+
+  @override
+  String get lockPasswordChanged => '密碼修改成功';
+
+  @override
+  String get lockOldPasswordWrong => '舊密碼錯誤';
+
+  @override
+  String get settingsSecurity => '安全設定';
+
+  @override
+  String get settingsAppLock => '應用鎖';
+
+  @override
+  String get settingsAppLockHint => '開啟應用時需要輸入密碼';
+
+  @override
+  String get settingsSetPassword => '設定應用密碼';
+
+  @override
+  String get settingsChangePassword => '修改應用密碼';
+
+  @override
+  String get settingsRemovePassword => '關閉應用密碼';
+
+  @override
+  String get settingsRemovePasswordConfirm => '確定要關閉應用密碼嗎？關閉後任何人都可以存取您的財務資料。';
 }

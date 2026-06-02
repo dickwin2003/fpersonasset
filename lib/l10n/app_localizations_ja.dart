@@ -514,6 +514,76 @@ class SJa extends S {
 
   @override
   String get expenseOther => 'その他の支出';
+
+  @override
+  String get lockTitle => 'パスワード入力';
+
+  @override
+  String get lockSubtitle => 'パスワードを入力してアプリのロックを解除してください';
+
+  @override
+  String get lockWrongPassword => 'パスワードが間違っています';
+
+  @override
+  String get lockEnterPassword => 'パスワードを入力してください';
+
+  @override
+  String get lockConfirmPassword => 'パスワードを再入力してください';
+
+  @override
+  String get lockPasswordMismatch => 'パスワードが一致しません';
+
+  @override
+  String get lockSetPassword => 'パスワードを設定';
+
+  @override
+  String get lockChangePassword => 'パスワードを変更';
+
+  @override
+  String get lockRemovePassword => 'パスワードロックを解除';
+
+  @override
+  String get lockPasswordSet => 'パスワードロックが有効になりました';
+
+  @override
+  String get lockPasswordRemoved => 'パスワードロックが無効になりました';
+
+  @override
+  String get lockOldPassword => '現在のパスワードを入力';
+
+  @override
+  String get lockNewPassword => '新しいパスワードを入力';
+
+  @override
+  String get lockConfirmNewPassword => '新しいパスワードを再入力';
+
+  @override
+  String get lockPasswordChanged => 'パスワードが変更されました';
+
+  @override
+  String get lockOldPasswordWrong => '現在のパスワードが間違っています';
+
+  @override
+  String get settingsSecurity => 'セキュリティ';
+
+  @override
+  String get settingsAppLock => 'アプリロック';
+
+  @override
+  String get settingsAppLockHint => 'アプリ起動時にパスワードが必要です';
+
+  @override
+  String get settingsSetPassword => 'アプリパスワードを設定';
+
+  @override
+  String get settingsChangePassword => 'アプリパスワードを変更';
+
+  @override
+  String get settingsRemovePassword => 'アプリパスワードを解除';
+
+  @override
+  String get settingsRemovePasswordConfirm =>
+      'アプリパスワードを解除してもよろしいですか？解除すると誰でも財務データにアクセスできます。';
 }
 
 /// The translations for Japanese, as used in Japan (`ja_JP`).
@@ -1026,4 +1096,74 @@ class SJaJp extends SJa {
 
   @override
   String get expenseOther => 'その他の支出';
+
+  @override
+  String get lockTitle => 'パスワード入力';
+
+  @override
+  String get lockSubtitle => 'パスワードを入力してアプリのロックを解除してください';
+
+  @override
+  String get lockWrongPassword => 'パスワードが間違っています';
+
+  @override
+  String get lockEnterPassword => 'パスワードを入力してください';
+
+  @override
+  String get lockConfirmPassword => 'パスワードを再入力してください';
+
+  @override
+  String get lockPasswordMismatch => 'パスワードが一致しません';
+
+  @override
+  String get lockSetPassword => 'パスワードを設定';
+
+  @override
+  String get lockChangePassword => 'パスワードを変更';
+
+  @override
+  String get lockRemovePassword => 'パスワードロックを解除';
+
+  @override
+  String get lockPasswordSet => 'パスワードロックが有効になりました';
+
+  @override
+  String get lockPasswordRemoved => 'パスワードロックが無効になりました';
+
+  @override
+  String get lockOldPassword => '現在のパスワードを入力';
+
+  @override
+  String get lockNewPassword => '新しいパスワードを入力';
+
+  @override
+  String get lockConfirmNewPassword => '新しいパスワードを再入力';
+
+  @override
+  String get lockPasswordChanged => 'パスワードが変更されました';
+
+  @override
+  String get lockOldPasswordWrong => '現在のパスワードが間違っています';
+
+  @override
+  String get settingsSecurity => 'セキュリティ';
+
+  @override
+  String get settingsAppLock => 'アプリロック';
+
+  @override
+  String get settingsAppLockHint => 'アプリ起動時にパスワードが必要です';
+
+  @override
+  String get settingsSetPassword => 'アプリパスワードを設定';
+
+  @override
+  String get settingsChangePassword => 'アプリパスワードを変更';
+
+  @override
+  String get settingsRemovePassword => 'アプリパスワードを解除';
+
+  @override
+  String get settingsRemovePasswordConfirm =>
+      'アプリパスワードを解除してもよろしいですか？解除すると誰でも財務データにアクセスできます。';
 }

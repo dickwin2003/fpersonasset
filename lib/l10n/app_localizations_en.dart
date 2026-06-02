@@ -519,6 +519,76 @@ class SEn extends S {
 
   @override
   String get expenseOther => 'Other Expense';
+
+  @override
+  String get lockTitle => 'Enter Password';
+
+  @override
+  String get lockSubtitle => 'Enter password to unlock the app';
+
+  @override
+  String get lockWrongPassword => 'Wrong password, please try again';
+
+  @override
+  String get lockEnterPassword => 'Enter password';
+
+  @override
+  String get lockConfirmPassword => 'Confirm password';
+
+  @override
+  String get lockPasswordMismatch => 'Passwords do not match';
+
+  @override
+  String get lockSetPassword => 'Set Password';
+
+  @override
+  String get lockChangePassword => 'Change Password';
+
+  @override
+  String get lockRemovePassword => 'Remove Password Lock';
+
+  @override
+  String get lockPasswordSet => 'Password lock enabled';
+
+  @override
+  String get lockPasswordRemoved => 'Password lock disabled';
+
+  @override
+  String get lockOldPassword => 'Enter current password';
+
+  @override
+  String get lockNewPassword => 'Enter new password';
+
+  @override
+  String get lockConfirmNewPassword => 'Confirm new password';
+
+  @override
+  String get lockPasswordChanged => 'Password changed successfully';
+
+  @override
+  String get lockOldPasswordWrong => 'Current password is incorrect';
+
+  @override
+  String get settingsSecurity => 'Security';
+
+  @override
+  String get settingsAppLock => 'App Lock';
+
+  @override
+  String get settingsAppLockHint => 'Require password to open the app';
+
+  @override
+  String get settingsSetPassword => 'Set App Password';
+
+  @override
+  String get settingsChangePassword => 'Change App Password';
+
+  @override
+  String get settingsRemovePassword => 'Remove App Password';
+
+  @override
+  String get settingsRemovePasswordConfirm =>
+      'Are you sure you want to remove the app password? Anyone will be able to access your financial data.';
 }
 
 /// The translations for English, as used in the United States (`en_US`).
@@ -1036,4 +1106,74 @@ class SEnUs extends SEn {
 
   @override
   String get expenseOther => 'Other Expense';
+
+  @override
+  String get lockTitle => 'Enter Password';
+
+  @override
+  String get lockSubtitle => 'Enter password to unlock the app';
+
+  @override
+  String get lockWrongPassword => 'Wrong password, please try again';
+
+  @override
+  String get lockEnterPassword => 'Enter password';
+
+  @override
+  String get lockConfirmPassword => 'Confirm password';
+
+  @override
+  String get lockPasswordMismatch => 'Passwords do not match';
+
+  @override
+  String get lockSetPassword => 'Set Password';
+
+  @override
+  String get lockChangePassword => 'Change Password';
+
+  @override
+  String get lockRemovePassword => 'Remove Password Lock';
+
+  @override
+  String get lockPasswordSet => 'Password lock enabled';
+
+  @override
+  String get lockPasswordRemoved => 'Password lock disabled';
+
+  @override
+  String get lockOldPassword => 'Enter current password';
+
+  @override
+  String get lockNewPassword => 'Enter new password';
+
+  @override
+  String get lockConfirmNewPassword => 'Confirm new password';
+
+  @override
+  String get lockPasswordChanged => 'Password changed successfully';
+
+  @override
+  String get lockOldPasswordWrong => 'Current password is incorrect';
+
+  @override
+  String get settingsSecurity => 'Security';
+
+  @override
+  String get settingsAppLock => 'App Lock';
+
+  @override
+  String get settingsAppLockHint => 'Require password to open the app';
+
+  @override
+  String get settingsSetPassword => 'Set App Password';
+
+  @override
+  String get settingsChangePassword => 'Change App Password';
+
+  @override
+  String get settingsRemovePassword => 'Remove App Password';
+
+  @override
+  String get settingsRemovePasswordConfirm =>
+      'Are you sure you want to remove the app password? Anyone will be able to access your financial data.';
 }
