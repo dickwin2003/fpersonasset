@@ -23,11 +23,14 @@ workflows:
           flutter pub get
           pod install || true
           cd ..
-      - name: Build iOS (no codesign)
+      - name: Build iOS and create IPA (unsigned)
         script: |
           flutter build ios --release --no-codesign
+          mkdir -p build/ipa/Payload
+          cp -r build/ios/iphoneos/Runner.app build/ipa/Payload/
+          cd build/ipa && zip -r ../Runner_unsigned.ipa Payload && cd ../..
     artifacts:
-      - build/ios/iphoneos/Runner.app
+      - build/Runner_unsigned.ipa
       - /tmp/xcodebuild_logs/*.log
     publishing:
       email:
