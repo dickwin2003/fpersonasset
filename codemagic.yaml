@@ -1,0 +1,32 @@
+workflows:
+  ios-release:
+    name: iOS Release
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.jucai.fpersonasset
+      flutter: stable
+      xcode: latest
+    scripts:
+      - name: Set up local properties
+        script: echo "flutter.minSdkVersion=21" > "$CM_BUILD_DIR/android/local.properties"
+      - name: Get Flutter packages
+        script: flutter packages pub get
+      - name: Install CocoaPods
+        script: |
+          cd ios && pod install && cd ..
+      - name: Build IPA
+        script: |
+          flutter build ipa --release \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - dickwin2003@users.noreply.github.com
+        notify:
+          success: true
+          failure: true
